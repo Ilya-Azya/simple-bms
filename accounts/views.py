@@ -11,6 +11,6 @@ def signup(request):
             user = form.save()
             login(request, user)
             return redirect('home')
-        else:
+    else:
             form = SignUpForm()
-        return render(request, 'accounts/signup.html', {'form': form})
+    return render(request, 'accounts/signup.html', {'form': form})
