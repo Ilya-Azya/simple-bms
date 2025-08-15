@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+.env.*
+.envrc
+
+/media/
+staticfiles/
+db.sqlite3
+
+.idea/
+.vscode/
+
+*/migrations/__pycache__/
