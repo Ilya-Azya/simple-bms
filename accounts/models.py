@@ -14,5 +14,7 @@ class User(AbstractUser):
     default_team = models.ForeignKey("teams.Team", null=True, blank=True, on_delete=models.SET_NULL,
                                      related_name="default_users")
 
+    email = models.EmailField(unique=True)
+
     def __str__(self):
         return f"{self.username} ({self.role})"
