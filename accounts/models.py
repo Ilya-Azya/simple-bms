@@ -11,7 +11,8 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=GlobalRole.choices, default=GlobalRole.USER,
                             help_text="Global role (not in a current command)")
 
-    # default_team = models.ForeignKey()
+    default_team = models.ForeignKey("teams.Team", null=True, blank=True, on_delete=models.SET_NULL,
+                                     related_name="default_users")
 
     def __str__(self):
         return f"{self.username} ({self.role})"
