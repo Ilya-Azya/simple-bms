@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>{{ task.title }}</h2>
+    <p><b>Описание:</b> {{ task.description }}</p>
+    <p><b>Статус:</b> {{ task.get_status_display }}</p>
+    <p><b>Дедлайн:</b> {{ task.deadline }}</p>
+    <p><b>Исполнитель:</b> {{ task.team }}</p>
+
+    {% if user.role in "Team Admin Manager" %}
+        <a href="{% url 'task_edit' task.pk %}">Редактировать</a> |
+        <a href="{% url 'task_delete' task.pk %}">Удалить</a>
+    {% endif %}
+
+    <a href="{% url 'task_list' %}">Назад к списку</a>
+{% endblock %}
