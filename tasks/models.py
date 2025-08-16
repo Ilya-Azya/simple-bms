@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db import models
+
 from accounts.models import User
 from teams.models import Team
 
@@ -20,3 +22,16 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.status})"
+
+
+class Comment(models.Model):
+    task = models.ForeignKey("tasks.Task", on_delete=models.CASCADE, related_name="comments")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments")
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return f"{self.author.username}: {self.text[:30]}"

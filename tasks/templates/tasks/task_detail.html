@@ -1,15 +1,34 @@
 {% extends "base.html" %}
+
 {% block content %}
     <h2>{{ task.title }}</h2>
-    <p><b>Описание:</b> {{ task.description }}</p>
-    <p><b>Статус:</b> {{ task.get_status_display }}</p>
-    <p><b>Дедлайн:</b> {{ task.deadline }}</p>
-    <p><b>Исполнитель:</b> {{ task.team }}</p>
+    <p>{{ task.description }}</p>
+    <p>Статус: {{ task.status }}</p>
+    <p>Дедлайн: {{ task.deadline }}</p>
 
-    {% if user.role in "Team Admin Manager" %}
-        <a href="{% url 'task_edit' task.pk %}">Редактировать</a> |
-        <a href="{% url 'task_delete' task.pk %}">Удалить</a>
+    <hr>
+
+    <h3>Комментарии</h3>
+    <div>
+        {% for comment in comments %}
+            <p><b>{{ comment.author.username }}</b> ({{ comment.created_at|date:"d.m.Y H:i" }}):</p>
+            <p>{{ comment.text }}</p>
+            <hr>
+        {% empty %}
+            <p>Комментариев пока нет.</p>
+        {% endfor %}
+    </div>
+
+    {% if user.is_authenticated %}
+        <h4>Добавить комментарий</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Отправить</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.</p>
     {% endif %}
 
-    <a href="{% url 'task_list' %}">Назад к списку</a>
+    <a href="{% url 'tasks:task_list' %}">Назад</a>
 {% endblock %}
