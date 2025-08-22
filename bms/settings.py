@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'teams',
     'tasks',
     'meetings',
+    'evaluations',
 ]
 
 MIDDLEWARE = [
