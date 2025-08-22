@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <h1>Встречи</h1>
+        <a class="btn btn-primary mb-3" href="{% url 'meetings:meeting_create' %}">Создать встречу</a>
+        <ul class="list-group">
+            {% for m in meetings %}
+                <li class="list-group-item">
+                    <a href="{% url 'meetings:meeting_detail' m.pk %}"><strong>{{ m.title }}</strong></a>
+                    <div>{{ m.start_at }} — {{ m.end_at }} &mdash; команда: {{ m.team.name }}</div>
+                </li>
+            {% empty %}
+                <li class="list-group-item">Встреч не найдено</li>
+            {% endfor %}
+        </ul>
+
+        {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination mt-3">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link"
+                                                 href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
+                    {% endif %}
+                    {% for p in paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == p %}active{% endif %}"><a class="page-link"
+                                                                                                href="?page={{ p }}">{{ p }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+{% endblock %}
