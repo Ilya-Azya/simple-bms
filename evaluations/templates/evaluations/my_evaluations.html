@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <h1>Мои оценки</h1>
+        <a class="btn btn-outline-secondary mb-3" href="{% url 'evaluations:my_evaluations_average' %}">Средняя за
+            период</a>
+        <ul class="list-group">
+            {% for e in evaluations %}
+                <li class="list-group-item">
+                    <strong>{{ e.score }}/5</strong> — задача: {{ e.task.title }} —
+                    от {{ e.evaluator.get_full_name|default:e.evaluator.email }}
+                    <div>{{ e.comment|default:"—" }}</div>
+                    <small class="text-muted">{{ e.created_at }}</small>
+                </li>
+            {% empty %}
+                <li class="list-group-item">Оценок нет</li>
+            {% endfor %}
+        </ul>
+        {% if is_paginated %}
+            <nav aria-label="Page navigation">
+            </nav>
+        {% endif %}
+    </div>
+{% endblock %}

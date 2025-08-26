@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <h1>Средняя оценка за период</h1>
+        <form method="get" class="mb-3">
+            <label>С</label>
+            <input type="date" name="start" value="{{ start.date|default:'' }}">
+            <label>По</label>
+            <input type="date" name="end" value="{{ end.date|default:'' }}">
+            <button class="btn btn-primary">Показать</button>
+        </form>
+
+        {% if avg_score %}
+            <div class="alert alert-success">
+                Средняя оценка: <strong>{{ avg_score }}</strong> ({{ count }} оценок)
+            </div>
+        {% else %}
+            <div class="alert alert-info">Оценок за выбранный период нет.</div>
+        {% endif %}
+
+        <h3>Список оценок</h3>
+        <ul class="list-group">
+            {% for e in evaluations %}
+                <li class="list-group-item">{{ e.score }}/5 — {{ e.task.title }}
+                    — {{ e.evaluator.get_full_name|default:e.evaluator.email }} — {{ e.created_at }}</li>
+            {% empty %}
+                <li class="list-group-item">Оценок нет</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
