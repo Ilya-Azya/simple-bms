@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Присоединиться к команде</h2>
+    <form method="post">{% csrf_token %}
+        <input type="text" name="code" placeholder="Введите код">
+        <button type="submit">Вступить</button>
+    </form>
+{% endblock %}

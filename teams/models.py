@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils.crypto import get_random_string
 
 User = settings.AUTH_USER_MODEL
 
@@ -8,6 +9,11 @@ class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     invite_code = models.CharField(max_length=20, unique=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.invite_code:
+            self.invite_code = get_random_string(8)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name}"
