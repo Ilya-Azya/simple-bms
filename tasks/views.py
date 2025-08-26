@@ -1,24 +1,18 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 
+from core.permissions import is_admin, is_manager, can_edit_task, can_manage_task
 from .forms import TaskForm, CommentForm
 from .models import Task
 
 
-def team_admin_required(view_func):
-    def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            raise PermissionDenied("Login required")
-        if request.user.role not in ["Team Admin", "Manager"]:
-            raise PermissionDenied("No permissions")
-        return view_func(request, *args, **kwargs)
-
-    return wrapper
-
-
 def task_list(request):
     user = request.user
-    if user.role in ["Team Admin", "Manager"]:
+
+    if not user.is_authenticated:
+        raise PermissionDenied("You should be authenticated")
+
+    if is_admin(user) or is_manager(user):
         tasks = Task.objects.all()
     else:
         tasks = Task.objects.filter(team=user.default_team)
@@ -45,38 +39,48 @@ def task_detail(request, pk):
     })
 
 
-@team_admin_required
 def task_create(request):
+    user = request.user
+
+    if not (is_manager(user) or is_admin(user)):
+        raise PermissionDenied("You do not have permissions for create a task")
+
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
-            task.created_by = request.user
-            task.team = request.user.default_team
+            task.created_by = user
+            task.team = user.default_team
             task.save()
-            return redirect("task_list")
+            return redirect("tasks:task_list")
     else:
         form = TaskForm()
     return render(request, "tasks/task_form.html", {"form": form})
 
 
-@team_admin_required
 def task_edit(request, pk):
     task = get_object_or_404(Task, pk=pk, team=request.user.default_team)
+
+    if not can_edit_task(request.user, task):
+        raise PermissionDenied("You have not permissions for edit this task")
+
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
-            return redirect("task_detail", pk=task.pk)
+            return redirect("tasks:task_detail", pk=task.pk)
     else:
         form = TaskForm(instance=task)
     return render(request, "tasks/task_form.html", {"form": form})
 
 
-@team_admin_required
 def task_delete(request, pk):
     task = get_object_or_404(Task, pk=pk, team=request.user.default_team)
+
+    if not can_manage_task(request.user, task):
+        raise PermissionDenied("You have not permissions for delete this task")
+
     if request.method == "POST":
         task.delete()
-        return redirect("task_list")
+        return redirect("tasks:task_list")
     return render(request, "tasks/task_confirm_delete.html", {"task": task})

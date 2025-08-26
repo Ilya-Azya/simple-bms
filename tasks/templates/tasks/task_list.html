@@ -5,7 +5,7 @@
     <ul>
         {% for task in tasks %}
             <li>
-                <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
+                <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.title }}</a>
                 ({{ task.get_status_display }})
             </li>
         {% empty %}
@@ -14,7 +14,7 @@
     </ul>
 
     {% if user.role in "Team Admin Manager" %}
-        <a href="{% url 'task_create' %}">Создать задачу</a>
+        <a href="{% url 'tasks:task_create' %}">Создать задачу</a>
     {% endif %}
 
 {% endblock %}
