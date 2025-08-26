@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>День {{ day_date }}</h2>
+
+    <h3>Задачи:</h3>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                📝 <a href="{% url 'tasks:task_detail' task.id %}">{{ task.title }}</a> ({{ task.status }})
+            </li>
+        {% empty %}
+            <li>Нет задач</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Встречи:</h3>
+    <ul>
+        {% for meeting in meetings %}
+            <li>
+                📅 {{ meeting.title }}
+                ({{ meeting.start_at|date:"H:i" }} — {{ meeting.end_at|date:"H:i" }})
+            </li>
+        {% empty %}
+            <li>Нет встреч</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
