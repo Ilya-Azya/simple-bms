@@ -9,13 +9,16 @@
                     <h5 class="card-title">{{ task_obj.title }}</h5>
                     <p class="card-text">{{ task_obj.description|default:"—" }}</p>
                     <p class="mb-0"><strong>Команда:</strong> {{ task_obj.team.name }}</p>
-                    <p class="mb-0"><strong>Исполнитель:</strong>
-                        {% if performer %}
-                            {{ performer.get_full_name|default:performer.email }}
+                    <p class="mb-0"><strong>Исполнители:</strong>
+                        {% if performers %}
+                            {% for p in performers %}
+                                {{ p.username }} ({{ p.email }}){% if not forloop.last %}, {% endif %}
+                            {% endfor %}
                         {% else %}
-                            {{ task_obj.created_by.get_full_name|default:task_obj.created_by.email }}
+                            — нет участников —
                         {% endif %}
                     </p>
+
                 </div>
             </div>
         {% endif %}

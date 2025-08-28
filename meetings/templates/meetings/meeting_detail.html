@@ -12,7 +12,7 @@
         </p>
 
         {% if user.is_authenticated %}
-            {% if user.role in "admin manager" or is_member %}
+            {% if is_manager_or_admin or is_member %}
                 <a class="btn btn-sm btn-outline-primary" href="{% url 'meetings:meeting_edit' meeting.pk %}">Редактировать</a>
                 <a class="btn btn-sm btn-outline-danger"
                    href="{% url 'meetings:meeting_delete' meeting.pk %}">Удалить</a>

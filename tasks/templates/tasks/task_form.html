@@ -4,7 +4,24 @@
 
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <p>
+            {{ form.title.label_tag }} {{ form.title }}
+        </p>
+        <p>
+            {{ form.description.label_tag }} {{ form.description }}
+        </p>
+        <p>
+            {{ form.deadline.label_tag }} {{ form.deadline }}
+        </p>
+        <p>
+            {{ form.status.label_tag }} {{ form.status }}
+        </p>
+        <p>
+            {{ form.assignee.label_tag }} {{ form.assignee }}
+        </p>
+        <p>
+            {{ form.team.label_tag }} {{ form.team }}
+        </p>
         <button type="submit">Сохранить</button>
     </form>
 

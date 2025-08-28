@@ -1,20 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>Список задач</h2>
-
-    <ul>
-        {% for task in tasks %}
-            <li>
-                <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.title }}</a>
-                ({{ task.get_status_display }})
+    <ul class="list-group">
+        {% for task, can_eval in tasks_with_perms %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{% url 'tasks:task_detail' task.pk %}"><strong>{{ task.title }}</strong></a>
+                    <div>Команда: {{ task.team.name }} | Дедлайн: {{ task.deadline }}</div>
+                </div>
+                <div>
+                    {% if user.is_authenticated and can_eval %}
+                        <a href="{% url 'evaluations:create_evaluation' task_id=task.pk %}"
+                           class="btn btn-sm btn-outline-success">Оценить</a>
+                    {% endif %}
+                </div>
             </li>
-        {% empty %}
-            <li>Задач пока нет</li>
         {% endfor %}
+
     </ul>
 
-    {% if user.role in "Team Admin Manager" %}
-        <a href="{% url 'tasks:task_create' %}">Создать задачу</a>
+    {% if user.is_authenticated and can_create_task %}
+        <a href="{% url 'tasks:task_create' %}" class="btn btn-primary mt-3">Создать задачу</a>
     {% endif %}
 
 {% endblock %}

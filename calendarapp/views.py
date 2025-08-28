@@ -8,8 +8,8 @@ from tasks.models import Task
 
 
 def month_view(request, year, month):
-    cal = calendar.Calendar(firstweekday=0)
-    month_days = cal.itermonthdates(year, month)
+    days_in_month = calendar.monthrange(year, month)[1]
+    month_days = [date(year, month, day) for day in range(1, days_in_month + 1)]
 
     tasks = Task.objects.filter(deadline__year=year, deadline__month=month)
     meetings = Meeting.objects.filter(start_at__year=year, start_at__month=month)

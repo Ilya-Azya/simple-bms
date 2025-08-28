@@ -26,9 +26,11 @@
             {{ form.as_p }}
             <button type="submit">Отправить</button>
         </form>
-    {% else %}
-        <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.</p>
     {% endif %}
 
-    <a href="{% url 'tasks:task_list' %}">Назад</a>
+    {% if can_eval_task %}
+        <a href="{% url 'evaluations:create_evaluation' task_id=task.pk %}" class="btn btn-success mt-2">Оценить задачу</a>
+    {% endif %}
+
+    <a href="{% url 'tasks:task_list' %}" class="btn btn-link mt-3">Назад</a>
 {% endblock %}

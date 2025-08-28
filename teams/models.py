@@ -10,9 +10,18 @@ class Team(models.Model):
     invite_code = models.CharField(max_length=20, unique=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through="TeamMembership",
+        related_name="teams"
+    )
+
     def save(self, *args, **kwargs):
         if not self.invite_code:
-            self.invite_code = get_random_string(8)
+            code = get_random_string(8)
+            while Team.objects.filter(invite_code=code).exists():
+                code = get_random_string(8)
+            self.invite_code = code
         super().save(*args, **kwargs)
 
     def __str__(self):

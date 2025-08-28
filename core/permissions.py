@@ -1,26 +1,29 @@
+from teams.models import TeamMembership
+
+
 def is_admin(user):
-    return user.is_authenticated and user.role == "Team Admin"
+    return user.role == "Team Admin" or user.role == "team admin"
 
 
-def is_manager(user):
-    return user.is_authenticated and user.role == "Manager"
+def has_role_in_team(user, team, roles):
+    return TeamMembership.objects.filter(user=user, team=team, role__in=roles).exists()
 
 
-def can_manage_task(user, task):
-    if not user.is_authenticated:
-        return False
-    if is_admin(user):
-        return True
-    if is_manager(user) and user.default_team_id == task.team_id:
-        return True
-    return False
+def is_team_admin(user, team):
+    return has_role_in_team(user, team, [TeamMembership.Role.ADMIN])
+
+
+def is_team_manager(user, team):
+    return has_role_in_team(user, team, [TeamMembership.Role.MANAGER])
 
 
 def can_edit_task(user, task):
-    if not user.is_authenticated:
-        return False
-    if is_admin(user):
-        return True
-    if task.created_by_id == user.id:
-        return True
-    return False
+    return (
+            task.created_by == user
+            or is_team_admin(user, task.team)
+            or is_team_manager(user, task.team)
+    )
+
+
+def can_manage_task(user, task):
+    return is_team_admin(user, task.team)

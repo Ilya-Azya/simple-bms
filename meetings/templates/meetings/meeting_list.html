@@ -5,9 +5,19 @@
         <a class="btn btn-primary mb-3" href="{% url 'meetings:meeting_create' %}">Создать встречу</a>
         <ul class="list-group">
             {% for m in meetings %}
-                <li class="list-group-item">
-                    <a href="{% url 'meetings:meeting_detail' m.pk %}"><strong>{{ m.title }}</strong></a>
-                    <div>{{ m.start_at }} — {{ m.end_at }} &mdash; команда: {{ m.team.name }}</div>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="{% url 'meetings:meeting_detail' m.pk %}"><strong>{{ m.title }}</strong></a>
+                        <div>{{ m.start_at }} — {{ m.end_at }} &mdash; команда: {{ m.team.name }}</div>
+                    </div>
+                    <div>
+                        {% if user.is_authenticated %}
+                            {% if user_perms.m.pk %}
+                                <a href="{% url 'meetings:meeting_edit' m.pk %}" class="btn btn-sm btn-outline-primary">Редактировать</a>
+                                <a href="{% url 'meetings:meeting_delete' m.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                 </li>
             {% empty %}
                 <li class="list-group-item">Встреч не найдено</li>
