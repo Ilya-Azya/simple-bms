@@ -8,12 +8,12 @@ from .models import Task, Comment
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["title", "description", "team", "deadline"]
+        fields = ["title", "description", "team", "deadline", "status"]
         widgets = {
             "deadline": forms.DateInput(attrs={"type": "date"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, editing=False, **kwargs):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
@@ -22,6 +22,8 @@ class TaskForm(forms.ModelForm):
                 self.fields["team"].queryset = Team.objects.all()
             else:
                 self.fields["team"].queryset = user.teams.all()
+        if not editing:
+            self.fields.pop('status', None)
 
 
 class CommentForm(forms.ModelForm):

@@ -53,12 +53,15 @@ def task_detail(request, pk):
                                                                                                         task.team)
     can_change_status = can_eval_task
 
+    can_delete_change = is_admin(request.user) or task.created_by == request.user
+
     context = {
         "task": task,
         "comments": task.comments.all(),
         "form": form,
         "can_eval_task": can_eval_task,
         "can_change_status": can_change_status,
+        "can_delete_change": can_delete_change,
     }
     return render(request, "tasks/task_detail.html", context)
 
@@ -70,7 +73,7 @@ def task_create(request):
         raise PermissionDenied("You do not have permissions for create a task")
 
     if request.method == "POST":
-        form = TaskForm(request.POST, user=user)
+        form = TaskForm(request.POST, user=user, editing=False)
         if form.is_valid():
             task = form.save(commit=False)
             team = task.team
@@ -82,7 +85,7 @@ def task_create(request):
             task.save()
             return redirect("tasks:task_list")
     else:
-        form = TaskForm(user=user)
+        form = TaskForm(user=user, editing=False)
     return render(request, "tasks/task_form.html", {"form": form})
 
 
@@ -93,12 +96,12 @@ def task_edit(request, pk):
         raise PermissionDenied("You have not permissions for edit this task")
 
     if request.method == "POST":
-        form = TaskForm(request.POST, instance=task, user=request.user)
+        form = TaskForm(request.POST, instance=task, user=request.user, editing=True)
         if form.is_valid():
             form.save()
             return redirect("tasks:task_detail", pk=task.pk)
     else:
-        form = TaskForm(instance=task, user=request.user)
+        form = TaskForm(instance=task, user=request.user, editing=True)
     return render(request, "tasks/task_form.html", {"form": form})
 
 
