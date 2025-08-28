@@ -3,7 +3,22 @@
 {% block content %}
     <h2>{{ task.title }}</h2>
     <p>{{ task.description }}</p>
-    <p>Статус: {{ task.status }}</p>
+    <p>
+        Статус: {{ task.status }}
+        {% if can_change_status %}
+            <form method="post" action="{% url 'tasks:change_status' task.pk %}" style="display:inline;">
+                {% csrf_token %}
+                {% if task.status == "Open" %}
+                    <button name="status" value="In Progress" class="btn btn-sm btn-warning">В процессе</button>
+                {% elif task.status == "In Progress" %}
+                    <button name="status" value="Done" class="btn btn-sm btn-success">Выполнено</button>
+                {% elif task.status == "Done" %}
+                    <button name="status" value="In Progress" class="btn btn-sm btn-warning">Возобновить</button>
+                {% endif %}
+            </form>
+        {% endif %}
+
+    </p>
     <p>Дедлайн: {{ task.deadline }}</p>
 
     <hr>
@@ -29,8 +44,13 @@
     {% endif %}
 
     {% if can_eval_task %}
-        <a href="{% url 'evaluations:create_evaluation' task_id=task.pk %}" class="btn btn-success mt-2">Оценить задачу</a>
+        <a href="{% url 'evaluations:create_evaluation' task_id=task.pk %}" class="btn btn-success mt-2">Оценить
+            задачу</a>
     {% endif %}
-
+    <br>
+    {% if can_change_status %}
+        <a href="{% url 'tasks:task_delete' pk=task.pk %}" class="btn btn-danger mt-2">Удалить задачу</a>
+    {% endif %}
+    <br>
     <a href="{% url 'tasks:task_list' %}" class="btn btn-link mt-3">Назад</a>
 {% endblock %}

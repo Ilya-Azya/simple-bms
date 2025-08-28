@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 
@@ -50,12 +51,14 @@ def task_detail(request, pk):
 
     can_eval_task = is_admin(request.user) or is_team_admin(request.user, task.team) or is_team_manager(request.user,
                                                                                                         task.team)
+    can_change_status = can_eval_task
 
     context = {
         "task": task,
         "comments": task.comments.all(),
         "form": form,
         "can_eval_task": can_eval_task,
+        "can_change_status": can_change_status,
     }
     return render(request, "tasks/task_detail.html", context)
 
@@ -109,3 +112,21 @@ def task_delete(request, pk):
         task.delete()
         return redirect("tasks:task_list")
     return render(request, "tasks/task_confirm_delete.html", {"task": task})
+
+
+def change_status(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+
+    if not (is_admin(request.user) or
+            is_team_admin(request.user, task.team) or
+            is_team_manager(request.user, task.team)):
+        raise PermissionDenied("You have not permissions for change status")
+
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+        if new_status:
+            task.status = new_status
+            task.save()
+            messages.success(request, f"Status changed on {new_status}")
+
+    return redirect("tasks:task_detail", pk=pk)
