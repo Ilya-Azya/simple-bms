@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 
 from core.permissions import can_edit_task, can_manage_task, is_team_manager, is_team_admin, is_admin
@@ -18,8 +19,13 @@ def task_list(request):
     else:
         teams = user.teams.all()
         tasks = Task.objects.filter(team__in=teams)
+
+    paginator = Paginator(tasks, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     tasks_with_perms = []
-    for task in tasks:
+    for task in page_obj:
         can_eval = is_admin(user) or is_team_admin(user, task.team) or is_team_manager(user, task.team)
         tasks_with_perms.append((task, can_eval))
 
@@ -28,6 +34,7 @@ def task_list(request):
     context = {
         "tasks_with_perms": tasks_with_perms,
         "can_create_task": can_create_task,
+        "page_obj": page_obj,
     }
     return render(request, "tasks/task_list.html", context)
 
