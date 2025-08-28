@@ -17,6 +17,12 @@
     <a href="{% url 'calendarapp:month_view' current_year current_month %}">Календарь</a> |
     <a href="{% url 'evaluations:my_evaluations' %}">Мои оценки</a> |
     <a href="{% url 'profile' %}">Профиль</a> |
+    <a href="{% url 'teams:join_team' %}">Присоедениться к команде</a> |
+    {% if user.is_authenticated %}
+        {% if is_admin_user %}
+            <a href="{% url 'teams:team_list' %}">Управление командами</a> |
+        {% endif %}
+    {% endif %}
 
     {% if user.is_authenticated %}
         <form method="post" action="{% url 'logout' %}" style="display:inline;">
