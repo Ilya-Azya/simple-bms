@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <h1>{{ meeting.title }}</h1>
+        <p>{{ meeting.description }}</p>
+        <p><strong>Команда:</strong> {{ meeting.team.name }}</p>
+        <p><strong>Время:</strong> {{ meeting.start_at }} — {{ meeting.end_at }}</p>
+        <p><strong>Участники:</strong>
+            {% for u in meeting.participants.all %}
+                {{ u.get_full_name|default:u.email }}{% if not forloop.last %}, {% endif %}
+            {% empty %}нет участников{% endfor %}
+        </p>
+
+        {% if user.is_authenticated %}
+            {% if is_manager_or_admin or is_member %}
+                <a class="btn btn-sm btn-outline-primary" href="{% url 'meetings:meeting_edit' meeting.pk %}">Редактировать</a>
+                <a class="btn btn-sm btn-outline-danger"
+                   href="{% url 'meetings:meeting_delete' meeting.pk %}">Удалить</a>
+            {% endif %}
+        {% endif %}
+
+        <a class="btn btn-link" href="{% url 'meetings:meeting_list' %}">К списку</a>
+    </div>
+{% endblock %}

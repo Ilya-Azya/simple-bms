@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>{% if form.instance.pk %}Редактировать задачу{% else %}Создать задачу{% endif %}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <p>
+            {{ form.title.label_tag }} {{ form.title }}
+        </p>
+        <p>
+            {{ form.description.label_tag }} {{ form.description }}
+        </p>
+        <p>
+            {{ form.deadline.label_tag }} {{ form.deadline }}
+        </p>
+        <p>
+            {{ form.status.label_tag }} {{ form.status }}
+        </p>
+        <p>
+            {{ form.assignee.label_tag }} {{ form.assignee }}
+        </p>
+        <p>
+            {{ form.team.label_tag }} {{ form.team }}
+        </p>
+        <button type="submit">Сохранить</button>
+    </form>
+
+    <a href="{% url 'tasks:task_list' %}">Назад</a>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <h1>{% if object %}Редактировать встречу{% else %}Создать встречу{% endif %}</h1>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="mb-3">
+                {{ form.title.label_tag }} {{ form.title }}
+                {{ form.title.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.description.label_tag }} {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.team.label_tag }} {{ form.team }}
+                {{ form.team.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.participants.label_tag }} {{ form.participants }}
+                {{ form.participants.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.start_at.label_tag }} {{ form.start_at }}
+                {{ form.start_at.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.end_at.label_tag }} {{ form.end_at }}
+                {{ form.end_at.errors }}
+            </div>
+            <button class="btn btn-primary" type="submit">Сохранить</button>
+            <a class="btn btn-link" href="{% url 'meetings:meeting_list' %}">Отмена</a>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <h1>Удалить встречу</h1>
+        <p>Вы уверены, что хотите удалить встречу «{{ object.title }}»?</p>
+        <form method="post">{% csrf_token %}
+            <button class="btn btn-danger" type="submit">Удалить</button>
+            <a class="btn btn-link" href="{% url 'meetings:meeting_detail' object.pk %}">Отмена</a>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load calendar_tags %}
+{% block content %}
+    <h2>Календарь {{ month }}/{{ year }}</h2>
+    <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+            {% for day in month_days %}
+                {% if forloop.counter0|divisibleby:7 %}
+                    </tr>
+                    <tr>
+                {% endif %}
+                <td valign="top">
+                    <b>{{ day.day }}</b>
+                    <ul>
+                        {% for ev in day_events|get_item:day %}
+                            <li>
+                                {% if ev.0 == "task" %}
+                                    📝 <a href="{% url 'tasks:task_detail' ev.1.id %}">{{ ev.1.title }}</a>
+                                {% else %}
+                                    📅 {{ ev.1.title }} ({{ ev.1.start_at|date:"H:i" }})
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'calendarapp:day_view' day.year day.month day.day %}">Подробнее</a>
+                </td>
+            {% endfor %}
+            </tr>
+    </table>
+    <a href="{% url 'calendarapp:month_view' prev.0 prev.1 %}">←</a>
+    <a href="{% url 'calendarapp:month_view' next.0 next.1 %}">→</a>
+
+{% endblock %}

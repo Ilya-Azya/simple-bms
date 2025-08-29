@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{ task.title }}</h2>
+    <p>{{ task.description }}</p>
+    <p>
+        Статус: {{ task.status }}
+        {% if can_change_status %}
+            <form method="post" action="{% url 'tasks:change_status' task.pk %}" style="display:inline;">
+                {% csrf_token %}
+                {% if task.status == "Open" %}
+                    <button name="status" value="In Progress" class="btn btn-sm btn-warning">В процессе</button>
+                {% elif task.status == "In Progress" %}
+                    <button name="status" value="Done" class="btn btn-sm btn-success">Выполнено</button>
+                {% elif task.status == "Done" %}
+                    <button name="status" value="In Progress" class="btn btn-sm btn-warning">Возобновить</button>
+                {% endif %}
+            </form>
+        {% endif %}
+
+    </p>
+    <p>Дедлайн: {{ task.deadline }}</p>
+
+    <hr>
+
+    <h3>Комментарии</h3>
+    <div>
+        {% for comment in comments %}
+            <p><b>{{ comment.author.username }}</b> ({{ comment.created_at|date:"d.m.Y H:i" }}):</p>
+            <p>{{ comment.text }}</p>
+            <hr>
+        {% empty %}
+            <p>Комментариев пока нет.</p>
+        {% endfor %}
+    </div>
+
+    <div class="container-fluid">
+        <div class="d-flex w-100">
+            <div class="flex-grow-1 p-3 border-end">
+                <h2>{{ task.title }}</h2>
+                <p>{{ task.description }}</p>
+                <p>Статус: {{ task.status }}</p>
+                <p>Дедлайн: {{ task.deadline }}</p>
+
+                <hr>
+                <h3>Комментарии</h3>
+                <div>
+                    {% for comment in comments %}
+                        <p><b>{{ comment.author.username }}</b> ({{ comment.created_at|date:"d.m.Y H:i" }}):</p>
+                        <p>{{ comment.text }}</p>
+                        <hr>
+                    {% empty %}
+                        <p>Комментариев пока нет.</p>
+                    {% endfor %}
+                </div>
+
+                {% if user.is_authenticated %}
+                    <h4>Добавить комментарий</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                    </form>
+                {% endif %}
+            </div>
+            <div class="flex-shrink-0 p-3" style="width: 200px;">
+                {% if can_eval_task %}
+                    <a href="{% url 'evaluations:create_evaluation' task_id=task.pk %}"
+                       class="btn btn-success w-100 mb-2">Оценить задачу</a>
+                {% endif %}
+
+                {% if can_delete_change %}
+                    <a href="{% url 'tasks:task_delete' pk=task.pk %}" class="btn btn-danger w-100 mb-2">Удалить
+                        задачу</a>
+                    <a href="{% url 'tasks:task_edit' pk=task.pk %}" class="btn btn-warning w-100 mb-2">Редактировать
+                        задачу</a>
+                {% endif %}
+
+                <a href="{% url 'tasks:task_list' %}" class="btn btn-link w-100">Назад к списку задач</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
