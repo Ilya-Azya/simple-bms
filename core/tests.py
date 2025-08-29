@@ -34,7 +34,9 @@ def test_admin_status_returns_false_for_non_admin_user():
 
 @pytest.mark.django_db
 def test_backend_authenticate_with_username():
-    user = User.objects.create_user(username="testuser", email="user@test.com", password="pass")
+    user = User.objects.create_user(
+        username="testuser", email="user@test.com", password="pass"
+    )
     backend = EmailOrUsernameBackend()
     authenticated = backend.authenticate(None, username="testuser", password="pass")
     assert authenticated == user
@@ -42,18 +44,27 @@ def test_backend_authenticate_with_username():
 
 @pytest.mark.django_db
 def test_backend_authenticate_with_email():
-    user = User.objects.create_user(username="testuser", email="user@test.com", password="pass")
+    user = User.objects.create_user(
+        username="testuser", email="user@test.com", password="pass"
+    )
     backend = EmailOrUsernameBackend()
-    authenticated = backend.authenticate(None, username="user@test.com", password="pass")
+    authenticated = backend.authenticate(
+        None, username="user@test.com", password="pass"
+    )
     assert authenticated == user
 
 
 @pytest.mark.django_db
 def test_backend_authenticate_invalid_credentials():
-    User.objects.create_user(username="testuser", email="user@test.com", password="pass")
+    User.objects.create_user(
+        username="testuser", email="user@test.com", password="pass"
+    )
     backend = EmailOrUsernameBackend()
     assert backend.authenticate(None, username="wrong", password="pass") is None
-    assert backend.authenticate(None, username="user@test.com", password="wrongpass") is None
+    assert (
+        backend.authenticate(None, username="user@test.com", password="wrongpass")
+        is None
+    )
 
 
 @pytest.mark.django_db
@@ -62,7 +73,9 @@ def test_permissions_admin_and_manager():
         username="admin", email="admin@test.com", password="pass"
     )
     team = Team.objects.create(name="Team1")
-    TeamMembership.objects.create(user=user_admin, team=team, role=TeamMembership.Role.ADMIN)
+    TeamMembership.objects.create(
+        user=user_admin, team=team, role=TeamMembership.Role.ADMIN
+    )
 
     task = team.tasks.create(title="Task", created_by=user_admin, team=team)
 
@@ -79,7 +92,9 @@ def test_permissions_manager_can_edit():
         username="manager", email="manager@test.com", password="pass"
     )
     team = Team.objects.create(name="Team1")
-    TeamMembership.objects.create(user=manager, team=team, role=TeamMembership.Role.MANAGER)
+    TeamMembership.objects.create(
+        user=manager, team=team, role=TeamMembership.Role.MANAGER
+    )
 
     task = team.tasks.create(title="Task", created_by=creator, team=team)
 

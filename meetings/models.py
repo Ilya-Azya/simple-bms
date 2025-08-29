@@ -6,14 +6,22 @@ from django.db import models
 class Meeting(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    team = models.ForeignKey("teams.Team", on_delete=models.CASCADE, related_name="meetings")
-    participants = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name="meetings")
+    team = models.ForeignKey(
+        "teams.Team", on_delete=models.CASCADE, related_name="meetings"
+    )
+    participants = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, related_name="meetings"
+    )
     start_at = models.DateTimeField()
     end_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL,
-                                   related_name="created_meetings")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="created_meetings",
+    )
 
     class Meta:
         ordering = ("-start_at",)
@@ -28,7 +36,11 @@ class Meeting(models.Model):
         if self.end_at <= self.start_at:
             raise ValidationError("End of meeting should be later than start")
 
-        participants = self.participants.all() if self.pk else getattr(self, "_participants_for_validation", [])
+        participants = (
+            self.participants.all()
+            if self.pk
+            else getattr(self, "_participants_for_validation", [])
+        )
         for user in participants:
             u_qs = Meeting.objects.filter(
                 participants=user,
@@ -38,7 +50,9 @@ class Meeting(models.Model):
             if self.pk:
                 u_qs = u_qs.exclude(pk=self.pk)
             if u_qs.exists():
-                raise ValidationError(f"User {user.email} has another meeting at that time")
+                raise ValidationError(
+                    f"User {user.email} has another meeting at that time"
+                )
 
         overlap = Meeting.objects.filter(
             team=self.team,

@@ -5,7 +5,13 @@ from .views import EvaluationCreateView, MyEvaluationsListView, MyEvaluationAver
 app_name = "evaluations"
 
 urlpatterns = [
-    path("create/<int:task_id>/", EvaluationCreateView.as_view(), name="create_evaluation"),
+    path(
+        "create/<int:task_id>/",
+        EvaluationCreateView.as_view(),
+        name="create_evaluation",
+    ),
     path("my/", MyEvaluationsListView.as_view(), name="my_evaluations"),
-    path("my/average/", MyEvaluationAverageView.as_view(), name="my_evaluations_average"),
+    path(
+        "my/average/", MyEvaluationAverageView.as_view(), name="my_evaluations_average"
+    ),
 ]

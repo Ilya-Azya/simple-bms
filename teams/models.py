@@ -11,9 +11,7 @@ class Team(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        through="TeamMembership",
-        related_name="teams"
+        settings.AUTH_USER_MODEL, through="TeamMembership", related_name="teams"
     )
 
     def save(self, *args, **kwargs):
@@ -35,7 +33,9 @@ class TeamMembership(models.Model):
         ADMIN = "Admin", "admin"
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="memberships")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="team_membership")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="team_membership"
+    )
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.MEMBER)
     joined_at = models.DateTimeField(auto_now_add=True)
 

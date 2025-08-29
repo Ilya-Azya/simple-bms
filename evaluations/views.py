@@ -22,7 +22,11 @@ class EvaluationCreateView(LoginRequiredMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.task = get_object_or_404(Task, pk=kwargs.get("task_id"))
 
-        if str(getattr(self.task, "status", "")).strip().lower() not in ("done", "finished", "completed"):
+        if str(getattr(self.task, "status", "")).strip().lower() not in (
+            "done",
+            "finished",
+            "completed",
+        ):
             messages.error(request, "Only completed tasks can be assessed.")
             return redirect("tasks:task_detail", pk=self.task.pk)
 
@@ -32,7 +36,9 @@ class EvaluationCreateView(LoginRequiredMixin, CreateView):
         allowed = False
         if is_admin(user):
             allowed = True
-        elif team and has_role_in_team(user, team, [TeamMembership.Role.MANAGER, TeamMembership.Role.ADMIN]):
+        elif team and has_role_in_team(
+            user, team, [TeamMembership.Role.MANAGER, TeamMembership.Role.ADMIN]
+        ):
             allowed = True
 
         if not allowed:
@@ -55,9 +61,17 @@ class EvaluationCreateView(LoginRequiredMixin, CreateView):
             if memberships.exists():
                 ctx["performers"] = [m.user for m in memberships]
             else:
-                ctx["performers"] = [getattr(self.task, "assigned_to", getattr(self.task, "created_by", None))]
+                ctx["performers"] = [
+                    getattr(
+                        self.task, "assigned_to", getattr(self.task, "created_by", None)
+                    )
+                ]
         else:
-            ctx["performers"] = [getattr(self.task, "assigned_to", getattr(self.task, "created_by", None))]
+            ctx["performers"] = [
+                getattr(
+                    self.task, "assigned_to", getattr(self.task, "created_by", None)
+                )
+            ]
 
         return ctx
 
@@ -68,7 +82,11 @@ class EvaluationCreateView(LoginRequiredMixin, CreateView):
         if team:
             users_to_rate = [m.user for m in team.memberships.all()]
         else:
-            users_to_rate = [getattr(self.task, "assigned_to", getattr(self.task, "created_by", None))]
+            users_to_rate = [
+                getattr(
+                    self.task, "assigned_to", getattr(self.task, "created_by", None)
+                )
+            ]
 
         for u in users_to_rate:
             Evaluation.objects.create(
@@ -90,9 +108,8 @@ class MyEvaluationsListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return (
-            Evaluation.objects.filter(user=self.request.user)
-            .select_related("task", "evaluator")
+        return Evaluation.objects.filter(user=self.request.user).select_related(
+            "task", "evaluator"
         )
 
 
@@ -107,7 +124,11 @@ class MyEvaluationAverageView(LoginRequiredMixin, TemplateView):
         end_s = self.request.GET.get("end")
 
         try:
-            start = datetime.fromisoformat(start_s) if start_s else timezone.now() - timedelta(days=30)
+            start = (
+                datetime.fromisoformat(start_s)
+                if start_s
+                else timezone.now() - timedelta(days=30)
+            )
             end = datetime.fromisoformat(end_s) if end_s else timezone.now()
         except ValueError:
             start = timezone.now() - timedelta(days=30)
@@ -120,16 +141,21 @@ class MyEvaluationAverageView(LoginRequiredMixin, TemplateView):
         else:
             end = end + timedelta(days=1, seconds=-1)
 
-        qs = Evaluation.objects.filter(user=user, created_at__gte=start, created_at__lte=end).select_related("task",
-                                                                                                             "evaluator")
+        qs = Evaluation.objects.filter(
+            user=user, created_at__gte=start, created_at__lte=end
+        ).select_related("task", "evaluator")
 
         agg = qs.aggregate(avg_score=Avg("score"), cnt=Count("id"))
 
-        ctx.update({
-            "avg_score": round(agg["avg_score"], 2) if agg["avg_score"] is not None else None,
-            "count": agg["cnt"],
-            "start": start,
-            "end": end,
-            "evaluations": qs,
-        })
+        ctx.update(
+            {
+                "avg_score": (
+                    round(agg["avg_score"], 2) if agg["avg_score"] is not None else None
+                ),
+                "count": agg["cnt"],
+                "start": start,
+                "end": end,
+                "evaluations": qs,
+            }
+        )
         return ctx

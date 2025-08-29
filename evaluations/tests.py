@@ -25,8 +25,12 @@ def test_evaluation_form_invalid_score():
 @pytest.mark.django_db
 def test_cannot_evaluate_if_task_not_done(client):
     team = Team.objects.create(name="T")
-    user = User.objects.create_user(username="u1", email="u1@test.com", password="pass", role="Team Admin")
-    task = Task.objects.create(title="T", status="in_progress", created_by=user, team=team)
+    user = User.objects.create_user(
+        username="u1", email="u1@test.com", password="pass", role="Team Admin"
+    )
+    task = Task.objects.create(
+        title="T", status="in_progress", created_by=user, team=team
+    )
 
     client.login(username="u1", password="pass")
     url = reverse("evaluations:create_evaluation", args=[task.id])
@@ -39,8 +43,12 @@ def test_cannot_evaluate_if_task_not_done(client):
 @pytest.mark.django_db
 def test_cannot_evaluate_without_permissions(client):
     team = Team.objects.create(name="T")
-    creator = User.objects.create_user(username="creator", email="c@test.com", password="pass")
-    stranger = User.objects.create_user(username="stranger", email="s@test.com", password="pass")
+    creator = User.objects.create_user(
+        username="creator", email="c@test.com", password="pass"
+    )
+    User.objects.create_user(
+        username="stranger", email="s@test.com", password="pass"
+    )
 
     task = Task.objects.create(title="T", status="done", created_by=creator, team=team)
 
@@ -55,7 +63,9 @@ def test_cannot_evaluate_without_permissions(client):
 @pytest.mark.django_db
 def test_cannot_evaluate_twice(client):
     team = Team.objects.create(name="T")
-    admin = User.objects.create_user(username="admin", email="a@test.com", password="pass", role="Team Admin")
+    admin = User.objects.create_user(
+        username="admin", email="a@test.com", password="pass", role="Team Admin"
+    )
     task = Task.objects.create(title="T", status="done", created_by=admin, team=team)
 
     Evaluation.objects.create(task=task, evaluator=admin, user=admin, score=5)
@@ -71,10 +81,16 @@ def test_cannot_evaluate_twice(client):
 @pytest.mark.django_db
 def test_successful_evaluation_creation(client):
     team = Team.objects.create(name="T")
-    admin = User.objects.create_user(username="admin", email="a@test.com", password="pass", role="Team Admin")
-    teammate = User.objects.create_user(username="u2", email="u2@test.com", password="pass")
+    admin = User.objects.create_user(
+        username="admin", email="a@test.com", password="pass", role="Team Admin"
+    )
+    teammate = User.objects.create_user(
+        username="u2", email="u2@test.com", password="pass"
+    )
 
-    TeamMembership.objects.create(team=team, user=teammate, role=TeamMembership.Role.MANAGER)
+    TeamMembership.objects.create(
+        team=team, user=teammate, role=TeamMembership.Role.MANAGER
+    )
 
     task = Task.objects.create(title="T", status="done", created_by=admin, team=team)
 
@@ -89,7 +105,9 @@ def test_successful_evaluation_creation(client):
 @pytest.mark.django_db
 def test_multiple_team_members_get_evaluations(client):
     team = Team.objects.create(name="T")
-    admin = User.objects.create_user(username="admin", email="a@test.com", password="pass", role="Team Admin")
+    admin = User.objects.create_user(
+        username="admin", email="a@test.com", password="pass", role="Team Admin"
+    )
     u1 = User.objects.create_user(username="u1", email="u1@test.com", password="pass")
     u2 = User.objects.create_user(username="u2", email="u2@test.com", password="pass")
 
@@ -124,12 +142,20 @@ def test_evaluation_requires_team(client):
 @pytest.mark.django_db
 def test_manager_can_evaluate(client):
     team = Team.objects.create(name="T")
-    manager = User.objects.create_user(username="m", email="m@test.com", password="pass")
-    task_creator = User.objects.create_user(username="creator", email="c@test.com", password="pass")
+    manager = User.objects.create_user(
+        username="m", email="m@test.com", password="pass"
+    )
+    task_creator = User.objects.create_user(
+        username="creator", email="c@test.com", password="pass"
+    )
 
-    TeamMembership.objects.create(team=team, user=manager, role=TeamMembership.Role.MANAGER)
+    TeamMembership.objects.create(
+        team=team, user=manager, role=TeamMembership.Role.MANAGER
+    )
 
-    task = Task.objects.create(title="T", status="done", created_by=task_creator, team=team)
+    task = Task.objects.create(
+        title="T", status="done", created_by=task_creator, team=team
+    )
 
     client.login(username="m", password="pass")
     url = reverse("evaluations:create_evaluation", args=[task.id])
@@ -189,7 +215,7 @@ def test_average_view_invalid_dates(client):
 
 @pytest.mark.django_db
 def test_average_view_no_evaluations(client):
-    user = User.objects.create_user(username="u", email="u@test.com", password="pass")
+    User.objects.create_user(username="u", email="u@test.com", password="pass")
 
     client.login(username="u", password="pass")
     url = reverse("evaluations:my_evaluations_average")

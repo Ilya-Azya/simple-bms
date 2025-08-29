@@ -3,7 +3,13 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 
-from core.permissions import can_edit_task, can_manage_task, is_team_manager, is_team_admin, is_admin
+from core.permissions import (
+    can_edit_task,
+    can_manage_task,
+    is_team_manager,
+    is_team_admin,
+    is_admin,
+)
 from .forms import TaskForm, CommentForm
 from .models import Task
 
@@ -15,10 +21,10 @@ def task_list(request):
         raise PermissionDenied("You should be authenticated")
 
     if user.role == "Team Admin":
-        tasks = Task.objects.all()
+        tasks = Task.objects.all().order_by("-created_at")
     else:
         teams = user.teams.all()
-        tasks = Task.objects.filter(team__in=teams)
+        tasks = Task.objects.filter(team__in=teams).order_by("-created_at")
 
     paginator = Paginator(tasks, 10)
     page_number = request.GET.get("page")
@@ -26,11 +32,18 @@ def task_list(request):
 
     tasks_with_perms = []
     for task in page_obj:
-        can_eval = is_admin(user) or is_team_admin(user, task.team) or is_team_manager(user, task.team)
+        can_eval = (
+            is_admin(user)
+            or is_team_admin(user, task.team)
+            or is_team_manager(user, task.team)
+        )
         tasks_with_perms.append((task, can_eval))
 
-    can_create_task = is_admin(user) or is_team_admin(user, user.default_team) or is_team_manager(user,
-                                                                                                  user.default_team)
+    can_create_task = (
+        is_admin(user)
+        or is_team_admin(user, user.default_team)
+        or is_team_manager(user, user.default_team)
+    )
     context = {
         "tasks_with_perms": tasks_with_perms,
         "can_create_task": can_create_task,
@@ -56,8 +69,11 @@ def task_detail(request, pk):
     else:
         form = CommentForm()
 
-    can_eval_task = is_admin(request.user) or is_team_admin(request.user, task.team) or is_team_manager(request.user,
-                                                                                                        task.team)
+    can_eval_task = (
+        is_admin(request.user)
+        or is_team_admin(request.user, task.team)
+        or is_team_manager(request.user, task.team)
+    )
     can_change_status = can_eval_task
 
     can_delete_change = is_admin(request.user) or task.created_by == request.user
@@ -85,8 +101,14 @@ def task_create(request):
             task = form.save(commit=False)
             team = task.team
 
-            if not (is_admin(user) or is_team_admin(user, team) or is_team_manager(user, team)):
-                raise PermissionDenied("You do not have permissions to create a task in this team")
+            if not (
+                is_admin(user)
+                or is_team_admin(user, team)
+                or is_team_manager(user, team)
+            ):
+                raise PermissionDenied(
+                    "You do not have permissions to create a task in this team"
+                )
 
             task.created_by = user
             task.save()
@@ -99,7 +121,7 @@ def task_create(request):
 def task_edit(request, pk):
     task = get_object_or_404(Task, pk=pk)
 
-    if not can_edit_task(request.user, task):
+    if not (can_edit_task(request.user, task) or is_admin(request.user)):
         raise PermissionDenied("You have not permissions for edit this task")
 
     if request.method == "POST":
@@ -115,7 +137,7 @@ def task_edit(request, pk):
 def task_delete(request, pk):
     task = get_object_or_404(Task, pk=pk)
 
-    if not can_manage_task(request.user, task):
+    if not (can_manage_task(request.user, task) or is_admin(request.user)):
         raise PermissionDenied("You have not permissions for delete this task")
 
     if request.method == "POST":
@@ -127,9 +149,11 @@ def task_delete(request, pk):
 def change_status(request, pk):
     task = get_object_or_404(Task, pk=pk)
 
-    if not (is_admin(request.user) or
-            is_team_admin(request.user, task.team) or
-            is_team_manager(request.user, task.team)):
+    if not (
+        is_admin(request.user)
+        or is_team_admin(request.user, task.team)
+        or is_team_manager(request.user, task.team)
+    ):
         raise PermissionDenied("You have not permissions for change status")
 
     if request.method == "POST":

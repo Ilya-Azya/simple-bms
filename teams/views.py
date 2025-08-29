@@ -11,20 +11,20 @@ from .models import Team, TeamMembership
 def team_list(request):
     if not is_admin(request.user):
         messages.error(request, "You have not permissions for create a team")
-        return redirect('tasks:task_list')
+        return redirect("tasks:task_list")
 
     teams = Team.objects.all()
-    return render(request, 'teams/team_list.html', {'teams': teams})
+    return render(request, "teams/team_list.html", {"teams": teams})
 
 
 @login_required
 def create_team(request):
     if not is_admin(request.user):
         messages.error(request, "You have not permissions for create a team")
-        return redirect('teams:team_list')
+        return redirect("teams:team_list")
 
     invite_code = None
-    if request.method == 'POST':
+    if request.method == "POST":
         form = TeamForm(request.POST)
         if form.is_valid():
             team = form.save()
@@ -32,7 +32,9 @@ def create_team(request):
     else:
         form = TeamForm()
 
-    return render(request, 'teams/team_form.html', {'form': form, 'invite_code': invite_code})
+    return render(
+        request, "teams/team_form.html", {"form": form, "invite_code": invite_code}
+    )
 
 
 def join_team(request):
@@ -45,7 +47,7 @@ def join_team(request):
             membership, created = TeamMembership.objects.get_or_create(
                 team=team,
                 user=request.user,
-                defaults={"role": TeamMembership.Role.MEMBER}
+                defaults={"role": TeamMembership.Role.MEMBER},
             )
             if created:
                 messages.success(request, f"Вы присоединились к {team.name}")

@@ -9,7 +9,9 @@ User = get_user_model()
 
 @pytest.mark.django_db
 def test_create_user():
-    user = User.objects.create_user(username="user1", email="user1@example.com", password="pass1234")
+    user = User.objects.create_user(
+        username="user1", email="user1@example.com", password="pass1234"
+    )
     assert user.username == "user1"
     assert user.email == "user1@example.com"
     assert user.role == "User"
@@ -22,22 +24,24 @@ def test_signup_form_valid():
         "username": "testuser",
         "email": "test@example.com",
         "password1": "strongpassword123",
-        "password2": "strongpassword123"
+        "password2": "strongpassword123",
     }
     form = SignUpForm(data=form_data)
     assert form.is_valid()
-    user = form.save()
+    form.save()
     assert User.objects.filter(username="testuser").exists()
 
 
 @pytest.mark.django_db
 def test_signup_form_duplicate_email():
-    User.objects.create_user(username="user1", email="test@example.com", password="pass1234")
+    User.objects.create_user(
+        username="user1", email="test@example.com", password="pass1234"
+    )
     form_data = {
         "username": "user2",
         "email": "test@example.com",
         "password1": "strongpassword123",
-        "password2": "strongpassword123"
+        "password2": "strongpassword123",
     }
     form = SignUpForm(data=form_data)
     assert not form.is_valid()
@@ -46,7 +50,9 @@ def test_signup_form_duplicate_email():
 
 @pytest.mark.django_db
 def test_profile_form_edit():
-    user = User.objects.create_user(username="user1", email="user1@example.com", password="pass1234")
+    user = User.objects.create_user(
+        username="user1", email="user1@example.com", password="pass1234"
+    )
     form_data = {"first_name": "John", "last_name": "Doe", "email": "user1@example.com"}
     form = ProfileForm(data=form_data, instance=user)
     assert form.is_valid()
@@ -62,20 +68,17 @@ def test_signup_and_login(client):
         "username": "testuser",
         "email": "test@example.com",
         "password1": "strongpassword123",
-        "password2": "strongpassword123"
+        "password2": "strongpassword123",
     }
 
     response = client.post(reverse("signup"), signup_data)
     assert response.status_code == 302
 
     user = User.objects.get(username="testuser")
-    user.backend = 'core.backends.EmailOrUsernameBackend'
+    user.backend = "core.backends.EmailOrUsernameBackend"
     user.save()
 
-    login_data_username = {
-        "username": "testuser",
-        "password": "strongpassword123"
-    }
+    login_data_username = {"username": "testuser", "password": "strongpassword123"}
     login_url = reverse("login")
     response_username = client.post(login_url, login_data_username)
     assert response_username.status_code in [302, 200]
@@ -86,17 +89,16 @@ def test_signup_and_login(client):
     session.save()
 
     client.logout()
-    login_data_email = {
-        "username": "test@example.com",
-        "password": "strongpassword123"
-    }
+    login_data_email = {"username": "test@example.com", "password": "strongpassword123"}
     response_email = client.post(login_url, login_data_email)
     assert response_email.status_code in [302, 200]
 
 
 @pytest.mark.django_db
 def test_profile_view(client):
-    user = User.objects.create_user(username="user1", email="user1@example.com", password="pass1234")
+    user = User.objects.create_user(
+        username="user1", email="user1@example.com", password="pass1234"
+    )
     client.login(username="user1", password="pass1234")
     url = reverse("profile")
     data = {"first_name": "John", "last_name": "Doe", "email": "user1@example.com"}
@@ -108,17 +110,21 @@ def test_profile_view(client):
 
 @pytest.mark.django_db
 def test_delete_account_confirm_view(client):
-    user = User.objects.create_user(username="user1", email="user1@example.com", password="pass1234")
+    User.objects.create_user(
+        username="user1", email="user1@example.com", password="pass1234"
+    )
     client.login(username="user1", password="pass1234")
     url = reverse("delete_confirm")
     response = client.get(url)
     assert response.status_code == 200
-    assert 'accounts/delete_confirm.html' in [t.name for t in response.templates]
+    assert "accounts/delete_confirm.html" in [t.name for t in response.templates]
 
 
 @pytest.mark.django_db
 def test_delete_account_view(client):
-    user = User.objects.create_user(username="user1", email="user1@example.com", password="pass1234")
+    User.objects.create_user(
+        username="user1", email="user1@example.com", password="pass1234"
+    )
     client.login(username="user1", password="pass1234")
     url = reverse("delete_account")
     response = client.post(url)
@@ -132,7 +138,7 @@ def test_signup_form_invalid_email():
         "username": "testuser",
         "email": "not-an-email",
         "password1": "strongpassword123",
-        "password2": "strongpassword123"
+        "password2": "strongpassword123",
     }
     form = SignUpForm(data=form_data)
     assert not form.is_valid()
@@ -141,12 +147,14 @@ def test_signup_form_invalid_email():
 
 @pytest.mark.django_db
 def test_signup_form_duplicate_username():
-    User.objects.create_user(username="testuser", email="test1@example.com", password="pass1234")
+    User.objects.create_user(
+        username="testuser", email="test1@example.com", password="pass1234"
+    )
     form_data = {
         "username": "testuser",
         "email": "test2@example.com",
         "password1": "strongpassword123",
-        "password2": "strongpassword123"
+        "password2": "strongpassword123",
     }
     form = SignUpForm(data=form_data)
     assert not form.is_valid()
@@ -155,9 +163,13 @@ def test_signup_form_duplicate_username():
 
 @pytest.mark.django_db
 def test_login_invalid_password(client):
-    user = User.objects.create_user(username="testuser", email="test@example.com", password="correctpassword")
+    User.objects.create_user(
+        username="testuser", email="test@example.com", password="correctpassword"
+    )
     login_url = reverse("login")
-    response = client.post(login_url, {"username": "testuser", "password": "wrongpassword"})
+    response = client.post(
+        login_url, {"username": "testuser", "password": "wrongpassword"}
+    )
 
     assert response.status_code == 200
 
@@ -166,9 +178,13 @@ def test_login_invalid_password(client):
 
 @pytest.mark.django_db
 def test_login_invalid_email(client):
-    user = User.objects.create_user(username="testuser", email="test@example.com", password="correctpassword")
+    User.objects.create_user(
+        username="testuser", email="test@example.com", password="correctpassword"
+    )
     login_url = reverse("login")
-    response = client.post(login_url, {"username": "wrong@example.com", "password": "correctpassword"})
+    response = client.post(
+        login_url, {"username": "wrong@example.com", "password": "correctpassword"}
+    )
 
     assert response.status_code == 200
     assert "_auth_user_id" not in client.session

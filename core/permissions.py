@@ -19,9 +19,9 @@ def is_team_manager(user, team):
 
 def can_edit_task(user, task):
     return (
-            task.created_by == user
-            or is_team_admin(user, task.team)
-            or is_team_manager(user, task.team)
+        task.created_by == user
+        or is_team_admin(user, task.team)
+        or is_team_manager(user, task.team)
     )
 
 

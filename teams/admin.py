@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Team, TeamMembership
 
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_display = ("name", "invite_code", "created_at")

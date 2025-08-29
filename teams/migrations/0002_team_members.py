@@ -7,14 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('teams', '0001_initial'),
+        ("teams", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='team',
-            name='members',
-            field=models.ManyToManyField(related_name='teams', through='teams.TeamMembership', to=settings.AUTH_USER_MODEL),
+            model_name="team",
+            name="members",
+            field=models.ManyToManyField(
+                related_name="teams",
+                through="teams.TeamMembership",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

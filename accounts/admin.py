@@ -7,12 +7,25 @@ from .models import User
 
 
 class UserAdminForm(forms.ModelForm):
-    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput, required=False)
-    password2 = forms.CharField(label="Подтверждение пароля", widget=forms.PasswordInput, required=False)
+    password1 = forms.CharField(
+        label="Пароль", widget=forms.PasswordInput, required=False
+    )
+    password2 = forms.CharField(
+        label="Подтверждение пароля", widget=forms.PasswordInput, required=False
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'role', 'default_team', 'is_staff', 'is_active']
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "role",
+            "default_team",
+            "is_staff",
+            "is_active",
+        ]
 
     def clean(self):
         cleaned_data = super().clean()
@@ -37,22 +50,46 @@ class UserAdmin(BaseUserAdmin):
     form = UserAdminForm
     add_form = UserAdminForm
 
-    list_display = ('username', 'email', 'first_name', 'last_name', 'role', 'default_team', 'is_staff', 'is_active')
-    list_filter = ('role', 'is_staff', 'is_active')
-    search_fields = ('username', 'email', 'first_name', 'last_name')
-    ordering = ('username',)
+    list_display = (
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "role",
+        "default_team",
+        "is_staff",
+        "is_active",
+    )
+    list_filter = ("role", "is_staff", "is_active")
+    search_fields = ("username", "email", "first_name", "last_name")
+    ordering = ("username",)
 
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'password1', 'password2')}),
-        ('Личная информация', {'fields': ('first_name', 'last_name', 'role', 'default_team')}),
-        ('Права', {'fields': ('is_staff', 'is_active', 'groups', 'user_permissions')}),
+        (None, {"fields": ("username", "email", "password1", "password2")}),
+        (
+            "Личная информация",
+            {"fields": ("first_name", "last_name", "role", "default_team")},
+        ),
+        ("Права", {"fields": ("is_staff", "is_active", "groups", "user_permissions")}),
     )
 
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2', 'role', 'default_team', 'is_staff', 'is_active'),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "username",
+                    "email",
+                    "password1",
+                    "password2",
+                    "role",
+                    "default_team",
+                    "is_staff",
+                    "is_active",
+                ),
+            },
+        ),
     )
 
 

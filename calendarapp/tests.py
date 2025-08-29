@@ -11,7 +11,9 @@ from teams.models import Team
 
 @pytest.fixture
 def user(db):
-    return User.objects.create_user(username="user1", email="user1@example.com", password="pass1234")
+    return User.objects.create_user(
+        username="user1", email="user1@example.com", password="pass1234"
+    )
 
 
 @pytest.fixture
@@ -31,17 +33,14 @@ def test_month_view_basic(client, user, team):
 @pytest.mark.django_db
 def test_month_view_with_events(client, user, team):
     t1 = Task.objects.create(
-        title="Task 1",
-        created_by=user,
-        team=team,
-        deadline=date(2025, 8, 28)
+        title="Task 1", created_by=user, team=team, deadline=date(2025, 8, 28)
     )
     m1 = Meeting.objects.create(
         title="Meeting 1",
         team=team,
         created_by=user,
         start_at=datetime(2025, 8, 28, 10, 0, tzinfo=timezone.utc),
-        end_at=datetime(2025, 8, 28, 11, 0, tzinfo=timezone.utc)
+        end_at=datetime(2025, 8, 28, 11, 0, tzinfo=timezone.utc),
     )
     url = reverse("calendarapp:month_view", kwargs={"year": 2025, "month": 8})
     response = client.get(url)
@@ -63,17 +62,14 @@ def test_day_view_basic(client, user, team):
 @pytest.mark.django_db
 def test_day_view_with_events(client, user, team):
     t1 = Task.objects.create(
-        title="Task 1",
-        created_by=user,
-        team=team,
-        deadline=date(2025, 8, 28)
+        title="Task 1", created_by=user, team=team, deadline=date(2025, 8, 28)
     )
     m1 = Meeting.objects.create(
         title="Meeting 1",
         team=team,
         created_by=user,
         start_at=datetime(2025, 8, 28, 10, 0, tzinfo=timezone.utc),
-        end_at=datetime(2025, 8, 28, 11, 0, tzinfo=timezone.utc)
+        end_at=datetime(2025, 8, 28, 11, 0, tzinfo=timezone.utc),
     )
     url = reverse("calendarapp:day_view", kwargs={"year": 2025, "month": 8, "day": 28})
     response = client.get(url)
@@ -86,8 +82,12 @@ def test_day_view_with_events(client, user, team):
 
 @pytest.mark.django_db
 def test_month_view_multiple_tasks_same_day(client, user, team):
-    t1 = Task.objects.create(title="Task 1", created_by=user, team=team, deadline=date(2025, 8, 28))
-    t2 = Task.objects.create(title="Task 2", created_by=user, team=team, deadline=date(2025, 8, 28))
+    Task.objects.create(
+        title="Task 1", created_by=user, team=team, deadline=date(2025, 8, 28)
+    )
+    Task.objects.create(
+        title="Task 2", created_by=user, team=team, deadline=date(2025, 8, 28)
+    )
     url = reverse("calendarapp:month_view", kwargs={"year": 2025, "month": 8})
     response = client.get(url)
     day_events = response.context["day_events"]

@@ -1,7 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 
 from core.permissions import is_admin, is_team_admin, is_team_manager
 from .forms import MeetingForm
@@ -18,7 +24,9 @@ class MeetingListView(LoginRequiredMixin, ListView):
         ctx = super().get_context_data(**kwargs)
         user = self.request.user
         ctx["user_perms"] = {
-            m.pk: is_admin(user) or is_team_admin(user, m.team) or is_team_manager(user, m.team)
+            m.pk: is_admin(user)
+            or is_team_admin(user, m.team)
+            or is_team_manager(user, m.team)
             for m in ctx["meetings"]
         }
         return ctx
@@ -35,7 +43,9 @@ class MeetingDetailView(LoginRequiredMixin, DetailView):
         user = self.request.user
 
         context["is_member"] = meeting.team.memberships.filter(user=user).exists()
-        context["is_manager_or_admin"] = is_team_admin(user, meeting.team) or is_team_manager(user, meeting.team)
+        context["is_manager_or_admin"] = is_team_admin(
+            user, meeting.team
+        ) or is_team_manager(user, meeting.team)
 
         return context
 
@@ -49,7 +59,9 @@ class MeetingPermissionMixin:
         if not user.is_authenticated:
             raise PermissionDenied
 
-        if not (is_admin(user) or is_team_admin(user, team) or is_team_manager(user, team)):
+        if not (
+            is_admin(user) or is_team_admin(user, team) or is_team_manager(user, team)
+        ):
             raise PermissionDenied
 
         return super().dispatch(request, *args, **kwargs)
@@ -69,7 +81,9 @@ class MeetingCreateView(LoginRequiredMixin, CreateView):
         user = self.request.user
         team = form.cleaned_data.get("team")
 
-        if not (is_admin(user) or is_team_admin(user, team) or is_team_manager(user, team)):
+        if not (
+            is_admin(user) or is_team_admin(user, team) or is_team_manager(user, team)
+        ):
             raise PermissionDenied("You have no permissions for this team")
 
         form.instance.created_by = user

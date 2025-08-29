@@ -10,24 +10,54 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('tasks', '0002_comment'),
+        ("tasks", "0002_comment"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Evaluation',
+            name="Evaluation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('score', models.PositiveSmallIntegerField()),
-                ('comment', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('evaluator', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='given_evaluations', to=settings.AUTH_USER_MODEL)),
-                ('task', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='evaluations', to='tasks.task')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='evaluations', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("score", models.PositiveSmallIntegerField()),
+                ("comment", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "evaluator",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="given_evaluations",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "task",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="evaluations",
+                        to="tasks.task",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="evaluations",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-created_at',),
+                "ordering": ("-created_at",),
             },
         ),
     ]

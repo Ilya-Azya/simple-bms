@@ -10,28 +10,61 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('teams', '0001_initial'),
+        ("teams", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Meeting',
+            name="Meeting",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('start_at', models.DateTimeField()),
-                ('end_at', models.DateTimeField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_meetings', to=settings.AUTH_USER_MODEL)),
-                ('participants', models.ManyToManyField(blank=True, related_name='meetings', to=settings.AUTH_USER_MODEL)),
-                ('team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='meetings', to='teams.team')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("start_at", models.DateTimeField()),
+                ("end_at", models.DateTimeField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="created_meetings",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "participants",
+                    models.ManyToManyField(
+                        blank=True, related_name="meetings", to=settings.AUTH_USER_MODEL
+                    ),
+                ),
+                (
+                    "team",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="meetings",
+                        to="teams.team",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-start_at',),
-                'indexes': [models.Index(fields=['team', 'start_at', 'end_at'], name='meetings_me_team_id_46b4e6_idx')],
+                "ordering": ("-start_at",),
+                "indexes": [
+                    models.Index(
+                        fields=["team", "start_at", "end_at"],
+                        name="meetings_me_team_id_46b4e6_idx",
+                    )
+                ],
             },
         ),
     ]

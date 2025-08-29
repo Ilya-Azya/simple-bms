@@ -23,7 +23,7 @@ class TaskForm(forms.ModelForm):
             else:
                 self.fields["team"].queryset = user.teams.all()
         if not editing:
-            self.fields.pop('status', None)
+            self.fields.pop("status", None)
 
 
 class CommentForm(forms.ModelForm):
