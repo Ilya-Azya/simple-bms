@@ -71,11 +71,13 @@ class EvaluationCreateView(LoginRequiredMixin, CreateView):
             users_to_rate = [getattr(self.task, "assigned_to", getattr(self.task, "created_by", None))]
 
         for u in users_to_rate:
-            eval_obj = form.save(commit=False)
-            eval_obj.task = self.task
-            eval_obj.evaluator = user_evaluator
-            eval_obj.user = u
-            eval_obj.save()
+            Evaluation.objects.create(
+                task=self.task,
+                evaluator=user_evaluator,
+                user=u,
+                score=form.cleaned_data["score"],
+                comment=form.cleaned_data["comment"],
+            )
 
         messages.success(self.request, "Оценка сохранена для всех участников.")
         return redirect("evaluations:my_evaluations")
